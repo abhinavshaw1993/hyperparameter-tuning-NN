@@ -14,8 +14,11 @@ Input:
   decreseas, so does time taken.)
 
 Returns:
+- hyperparameters: List of Tuples. Tuple Stucture -(learning_rate, momentum).
+- sample_count: Number of samples returned.
 """
-def scale(learning_rate_range, momentum_range,r):
+def scaler(learning_rate_range, momentum_range,r):
+    # Initializing length and width. Can Be increased fo changing number of samples.
     length = 20
     width = 10
 
@@ -33,11 +36,18 @@ def scale(learning_rate_range, momentum_range,r):
     print ("Data: ", data)
 
     momentum_range = (0.0,1.0)
-    # Comverting to Foat.
-    # momentum_range = float(momentum_range)
+    learning_rate_range = (1e-5, 1e-1)
+
+    step_size_l = learning_rate_range[1] - learning_rate_range[0]
     step_size_w = momentum_range[1]-momentum_range[0]
-    sample1 = data[0]
-    print ("step_size ,sample1: ", step_size_w, sample1, step_size_w*sample1[1] / width)
+    hyperparameters = []
 
+    # Converting Poisson Samples to Hyperparameter Samples.
+    for i in range(0,len(data)):
+        sample = data[i]
+        learning_rate, momentum = step_size_l*sample[0] / length, step_size_w*sample[1] / width
+        hyperparameters.append((learning_rate, momentum))
 
-scale(10,10,4)
+    print (hyperparameters)
+
+scaler(10,10,4)
