@@ -56,7 +56,7 @@ Inputs:
 Returns:
 - accuracy: The accuracy of the network.
 """
-def compute(epochs, learning_rate, momentum):
+def compute( learning_rate, momentum, epochs = 50):
     #loading with CIFAR Data.
     X_train, y_train, X_val, y_val, X_test, y_test =\
     du.get_CIFAR10_data(num_training=10000, num_validation=10, num_test=1000)
@@ -100,7 +100,6 @@ def compute(epochs, learning_rate, momentum):
     # Testing the accuracy.Max returns both values and indices.
     y_test_pred = model(X_test)
     _ , y_test_pred = torch.max(y_test_pred.data,1)
-    print ("y_test_pred size,type y_test type  :", len(y_test_pred), type(y_test_pred), type(y_test))
 
     # Calculating total and corrct. Conversion required since target y_test_pred is a long tensor.
     total_labels = y_test.size(0)
@@ -108,9 +107,9 @@ def compute(epochs, learning_rate, momentum):
     accuracy = 100.0 * correct/total_labels, correct
 
     # Checking Accuracy and plotting graph.
-    print ( "Accuracy : ", 100.0 * correct/total_labels, correct)
+    # print ( "Accuracy : ", 100.0 * correct/total_labels, correct)
     # plot_graph(loss_dict)
 
     return accuracy
 
-compute(100, 5e-5, 0.9)
+print (compute( 5e-5, 0.9, 50))
