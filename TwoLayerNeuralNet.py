@@ -104,12 +104,14 @@ def compute( learning_rate, momentum, epochs = 50):
     # Calculating total and corrct. Conversion required since target y_test_pred is a long tensor.
     total_labels = y_test.size(0)
     correct = (y_test_pred.float() == y_test).sum()
-    accuracy = 100.0 * correct/total_labels, correct
+    accuracy = (100.0 * correct/total_labels, correct)
 
     # Checking Accuracy and plotting graph.
     # print ( "Accuracy : ", 100.0 * correct/total_labels, correct)
     # plot_graph(loss_dict)
 
+    # Accuracy + Correct Count.
     return accuracy
 
-print (compute( 5e-5, 0.9, 50))
+# print (compute( 5e-5, 0.85, 50))
+# print (compute( 1e-5, 0.9, 50))

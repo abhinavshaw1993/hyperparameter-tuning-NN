@@ -21,7 +21,7 @@ Returns:
 """
 def scaler(learning_rate_range, momentum_range,r):
     # Initializing length and width. Can Be increased fo changing number of samples.
-    length = 40
+    length = 20
     width = 20
 
     # Sample Count.
@@ -29,7 +29,7 @@ def scaler(learning_rate_range, momentum_range,r):
     cells = (length//size)* (width//size)
 
     # Initilizing Poisson Disc Sampling object.
-    grid = Grid(r, length, width)``
+    grid = Grid(r, length, width)
 
     # Random Seed.
     rand = (random.uniform(0, length), random.uniform(0, width))
