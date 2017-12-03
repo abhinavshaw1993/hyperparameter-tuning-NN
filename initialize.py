@@ -18,13 +18,13 @@ def main():
 
     #Calculating best Accuracy.
     best_lr, best_mom = max(accuracy, key=accuracy.get)
-    best_accuracy = accuracy[best_hyperparameter]
+    best_accuracy = accuracy[(best_lr,best_mom)]
 
     # best_lr, best_mom = (0.0006694521324073282, 0.7933857494299539)
     # best_accuracy = 34.5
     # dense_lr_ofst, dense_mom_ofst = 30, 10
 
-    print ("Best Hyperparameter and Accuracu found form Sparse Search:"\
+    print ("Best Hyperparameter and Accuracy found form Sparse Search:"\
     , best_lr, best_mom, best_accuracy)
 
     # Readjusting Hyperparameters for Denser Search.
@@ -41,7 +41,9 @@ def main():
 
     #Calculating best Accuracy.
     best_lr, best_mom = max(accuracy, key=accuracy.get)
-    best_accuracy = accuracy[best_hyperparameter]
+    best_accuracy = accuracy[(best_lr,best_mom)]
 
-    print ("Best Hyperparameter and Accuracu found form Dense Search:"\
+    print ("Best Hyperparameter and Accuracy found form Dense Search:"\
     , best_lr, best_mom, best_accuracy)
+
+main()

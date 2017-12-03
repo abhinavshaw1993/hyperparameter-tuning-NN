@@ -113,5 +113,5 @@ def compute( learning_rate, momentum, epochs = 50):
     # Accuracy + Correct Count.
     return accuracy
 
-# print (compute( 5e-5, 0.85, 50))
-# print (compute( 1e-5, 0.9, 50))
+
+# print (compute( learning_rate = 5e-4, momentum = 0.8, epochs = 50))
