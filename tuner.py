@@ -28,20 +28,23 @@ def tune_hyperparameters(learning_rate_range = (1e-5,1e-1), momentum_range = (0.
         learning_rate, momentum = 10**hyperparameter[0] ,hyperparameter[1]
 
         if (verbose):
-            print ("hyperparameter: ", hyperparameter)
+            print ("learning_rate, momentum: ", learning_rate, momentum)
         # print ("Learning Rate, momentum: ", learning_rate, momentum)
 
-        # The NeuralNet is Being Trained For 50 Parameters. Epochs Can be considered as a hyperparameter as well.
-        accuracy[hyperparameter] = net.compute(learning_rate = learning_rate, momentum = momentum, epochs = 50)
+        # The NeuralNet is Being Trained For 50 Parameters.
+        # Epochs Can be considered as a hyperparameter as well.
+        accuracy[(learning_rate, momentum)] = net.compute\
+        (learning_rate = learning_rate, momentum = momentum, epochs = 50)
 
         tock = time.time()
         time_dict[hyperparameter] = tock - tick
 
     avg_time_taken = sum(time_dict.values()) / len(time_dict)
 
-    print ("Accuracy Dictionary: " , accuracy)
-    print ("Avg. Time Taken in Sec: ",  avg_time_taken )
+    if (verbose):
+        print ("Accuracy Dictionary: " , accuracy)
+        print ("Avg. Time Taken in Sec: ",  avg_time_taken )
 
     return accuracy, avg_time_taken
 
-print (tune_hyperparameters(verbose =True))
+# print (tune_hyperparameters(verbose =True))
