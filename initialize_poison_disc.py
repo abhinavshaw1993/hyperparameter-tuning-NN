@@ -46,4 +46,8 @@ def main():
     print ("Best Hyperparameter and Accuracy found form Dense Search:"\
     , best_lr, best_mom, best_accuracy)
 
+    f = open('Output.txt','w')
+    f.write('best_lr, best_mom, best_accuracy ' +str(best_lr)+ str(best_mom) + str(best_accuracy))
+    f.close()
+
 main()
