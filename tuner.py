@@ -4,6 +4,8 @@ import TwoLayerNeuralNet as net
 import math
 import time
 
+
+def tune_hyperparameters(learning_rate_range = (1e-5,1e-1), momentum_range = (0.5,1),verbose = False):
 """
 Function to tune the hyperparameters. The learning_rate_range is converted to lof, since, it gives better result.
 
@@ -15,8 +17,6 @@ Returns:
 -accuracy : Return Dictionary of accuracies with keys being the hyperparameters used.
 -acg_time_taken : Return Avg. Time Taken to train the NeuralNet
 """
-def tune_hyperparameters(learning_rate_range = (1e-5,1e-1), momentum_range = (0.5,1),verbose = False):
-
     # Converting to Linear Range.
     learning_rate_range = ( math.log10(learning_rate_range[1]) , math.log10(learning_rate_range[0]) )
     hyperparameters,sample_count = hs.scaler(learning_rate_range,momentum_range, 2)

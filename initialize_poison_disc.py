@@ -3,7 +3,7 @@ import tuner
 """
 Main Function to start the procedure.
 """
-def main():
+def initilize_poisson_disc_search():
     # Declaring Parameters for tuner function.
     learning_rate_range= (1e-4,1e-2)
     momentum_range = (0.7,1)
@@ -46,8 +46,7 @@ def main():
     print ("Best Hyperparameter and Accuracy found form Dense Search:"\
     , best_lr, best_mom, best_accuracy)
 
-    f = open('Output.txt','w')
-    f.write('best_lr, best_mom, best_accuracy ' +str(best_lr)+ str(best_mom) + str(best_accuracy))
+    #Appending Output to poisson disc sample file.
+    f = open('outputs/Output_poisson_disc_search.txt','a+')
+    f.write('best_lr, best_mom, best_accuracy ' +str(best_lr)+' , '+ str(best_mom) +' , '+ str(best_accuracy) +'\n')
     f.close()
-
-main()
