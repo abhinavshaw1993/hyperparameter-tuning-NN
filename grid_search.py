@@ -43,7 +43,8 @@ def get_grid_hyperparameters(learning_rate_range,momentum_range, r):
     return hyperparameters, sample_count
 
 """
-Function that gets hyperparameters from grid search and train neural network on all of the hyperparameters.
+Function that gets hyperparameters from grid search and train neural network on
+all of the hyperparameters.
 
 Inputs:
 -learning_rate_range : Takes Learning Rate range.
@@ -90,7 +91,8 @@ def grid_search_tuner(learning_rate_range = (1e-5,1e-1), momentum_range = (0.5,1
     return accuracy, avg_time_taken
 
 """
-Function for initializing grid search.
+Function for initializing grid search. It des a sparse search and the does a
+dense search. This Way we save on computation well.
 
 """
 def initilize_grid_search():
@@ -98,7 +100,7 @@ def initilize_grid_search():
     # Declaring Parameters for tuner function.
     learning_rate_range= (1e-4,1e-2)
     momentum_range = (0.7,1)
-    verbose = True
+    verbose = False
 
     # Dense Search range offsets. In percent.
     dense_lr_ofst, dense_mom_ofst = 50, 10
@@ -106,7 +108,7 @@ def initilize_grid_search():
     # Tuning Network on the Hyperparameter range. This block Will be treated as
     # a sparse search.
     accuracy, avg_time_taken = grid_search_tuner(learning_rate_range =\
-    learning_rate_range ,momentum_range = momentum_range,verbose = True)
+    learning_rate_range ,momentum_range = momentum_range,verbose = verbose)
 
     #Calculating best Accuracy.
     best_lr, best_mom = max(accuracy, key=accuracy.get)
@@ -129,7 +131,7 @@ def initilize_grid_search():
     # Tuning Network on the Hyperparameter range. This block Will be treated as
     # a sparse search.
     accuracy, avg_time_taken = grid_search_tuner(learning_rate_range =\
-    learning_rate_range ,momentum_range = momentum_range,verbose = True)
+    learning_rate_range ,momentum_range = momentum_range,verbose = verbose)
 
     #Calculating best Accuracy.
     best_lr, best_mom = max(accuracy, key=accuracy.get)
@@ -139,6 +141,6 @@ def initilize_grid_search():
     , best_lr, best_mom, best_accuracy)
 
     #Writing file in append mode Saving data for calculation.
-    f = open('ouputs/Output_grid_search.txt','a+')
-    f.write('best_lr, best_mom, best_accuracy ' +str(best_lr)+' , '+ str(best_mom) +' , '+ str(best_accuracy) + '\n')
+    f = open('outputs/Output_grid_search.txt','a+')
+    f.write('\nbest_lr, best_mom, best_accuracy ' +str(best_lr)+' , '+ str(best_mom) +' , '+ str(best_accuracy) )
     f.close()

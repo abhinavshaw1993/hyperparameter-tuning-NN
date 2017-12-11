@@ -1,1 +1,0 @@
-best_lr, best_mom, best_accuracy 0.001021171815970.7152(35.0, 350)
