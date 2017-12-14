@@ -1,7 +1,12 @@
+###############################################################################
+# This module will scale the Hyperparameter range and sample using Grid Search.
+###############################################################################
+
 import numpy as np
 import math
 import TwoLayerNeuralNet as net
 import time
+import plotting_utils as plt
 
 """
 Function to get hyperparameters from grid search.
@@ -55,21 +60,26 @@ Returns:
 -accuracy : list of accuracy from every pair of learning rate and momentum.
 -avg_time_taken : avg. time taken to train using ever set of hyperparameters.
 """
-def grid_search_tuner(learning_rate_range = (1e-5,1e-1), momentum_range = (0.5,1),verbose = False):
+def grid_search_tuner(learning_rate_range = (1e-5,1e-1), momentum_range = (0.5,1)\
+,verbose = False, use_logspace = False):
 
     #Some Initialization
     accuracy = {}
     time_dict = {}
 
     #converting Learning rate range to linear space using log. Done this for
-    learning_rate_range = ( math.log10(learning_rate_range[1]) , math.log10(learning_rate_range[0]) )
+    if (use_logspace):
+        learning_rate_range = ( math.log10(learning_rate_range[1]) , math.log10(learning_rate_range[0]) )
 
     #Using Grid sampler.
     hyperparameters,sample_count = get_grid_hyperparameters(learning_rate_range,momentum_range, 2)
 
     for hyperparameter in hyperparameters:
         tick = time.time()
-        learning_rate, momentum = 10**hyperparameter[0] ,hyperparameter[1]
+        if (use_logspace):
+            learning_rate, momentum = 10**hyperparameter[0] ,hyperparameter[1]
+        else:
+            learning_rate, momentum = hyperparameter[0] ,hyperparameter[1]
 
         if (verbose):
             print ("learning_rate, momentum: ", learning_rate, momentum)
@@ -95,31 +105,40 @@ Function for initializing grid search. It des a sparse search and the does a
 dense search. This Way we save on computation well.
 
 """
-def initilize_grid_search():
+def initilize_grid_search(plot = False, verbose = False, use_logspace = False):
 
     # Declaring Parameters for tuner function.
-    learning_rate_range= (1e-4,1e-2)
+    learning_rate_range= (1e-5,1e-2)
     momentum_range = (0.7,1)
-    verbose = False
 
     # Dense Search range offsets. In percent.
-    dense_lr_ofst, dense_mom_ofst = 50, 10
+    dense_lr_ofst, dense_mom_ofst = 20, 10
+
+################################################################################
+################################ Sparse Search #################################
+################################################################################
 
     # Tuning Network on the Hyperparameter range. This block Will be treated as
     # a sparse search.
     accuracy, avg_time_taken = grid_search_tuner(learning_rate_range =\
-    learning_rate_range ,momentum_range = momentum_range,verbose = verbose)
+    learning_rate_range ,momentum_range = momentum_range,verbose = verbose, use_logspace = use_logspace)
 
     #Calculating best Accuracy.
     best_lr, best_mom = max(accuracy, key=accuracy.get)
     best_accuracy = accuracy[(best_lr,best_mom)]
 
-    # best_lr, best_mom = (0.0006694521324073282, 0.7933857494299539)
-    # best_accuracy = 34.5
-    # dense_lr_ofst, dense_mom_ofst = 30, 10
+    #  Obtaining Keys for plotting
+    keys = accuracy.keys()
 
     print ("Best Hyperparameter and Accuracy found form Sparse Search of Grid Search:"\
     , best_lr, best_mom, best_accuracy)
+
+    if (plot):
+        plt.plot_heatmap(accuracy= accuracy, file_name= "figures/grid_heatmap.png")
+
+################################################################################
+################################ Dense Search ##################################
+################################################################################
 
     # Readjusting Hyperparameters for Denser Search.
     learning_rate_range = ( best_lr - (best_lr * dense_lr_ofst / 100 ),\
@@ -131,16 +150,34 @@ def initilize_grid_search():
     # Tuning Network on the Hyperparameter range. This block Will be treated as
     # a sparse search.
     accuracy, avg_time_taken = grid_search_tuner(learning_rate_range =\
-    learning_rate_range ,momentum_range = momentum_range,verbose = verbose)
+    learning_rate_range ,momentum_range = momentum_range,verbose = verbose, use_logspace = use_logspace)
+
 
     #Calculating best Accuracy.
-    best_lr, best_mom = max(accuracy, key=accuracy.get)
-    best_accuracy = accuracy[(best_lr,best_mom)]
+    best_lr_new, best_mom_new = max(accuracy, key=accuracy.get)
+    best_accuracy_new = accuracy[(best_lr,best_mom)]
+
+    keys += accuracy.keys()
 
     print ("Best Hyperparameter and Accuracy found form Dense Search Grid Search: "\
-    , best_lr, best_mom, best_accuracy)
+    , best_lr_new, best_mom_new, best_accuracy_new)
+
+    # Selecting the new Hyperparameters if they give better results.
+    if best_accuracy_new > best_accuracy:
+        best_accuracy = best_accuracy_new
+        best_lr = best_lr_new
+        best_mom = best_mom_new
+
+    # Writing in file and plotting if plot is True.
+    if (use_logspace):
+        f = open('outputs/Output_grid_search_logspace.txt','a+')
+        if (plot):
+            plt.plot_hyperparameters(keys, "figures/grid_logspace.png")
+    else :
+        f = open('outputs/Output_grid_search_regularspace.txt','a+')
+        if (plot):
+            plt.plot_hyperparameters(keys, "figures/grid_regularspace.png")
 
     #Writing file in append mode Saving data for calculation.
-    f = open('outputs/Output_grid_search.txt','a+')
     f.write('\nbest_lr, best_mom, best_accuracy ' +str(best_lr)+' , '+ str(best_mom) +' , '+ str(best_accuracy) )
     f.close()
