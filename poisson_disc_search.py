@@ -8,6 +8,7 @@ from  poisson_disc import *
 import TwoLayerNeuralNet as net
 import math
 import time
+import plotting_utils as plt
 
 """
 poisson_disc_sampler takes samples and converts them to the scale of hyperparameters.
@@ -29,7 +30,7 @@ def poisson_disc_sampler(learning_rate_range, momentum_range,r):
 
     # Sample Count.
     size = r / sqrt(2)
-    cells = (length//size)* (width//size)
+    cells = (length/size)* (width/size)
 
     # Initilizing Poisson Disc Sampling object.
     grid = Grid(r, length, width)
@@ -72,17 +73,24 @@ Returns:
 used.
 -acg_time_taken : Return Avg. Time Taken to train the NeuralNet
 """
-def poisson_disc_search_tune(learning_rate_range = (1e-5,1e-1), momentum_range = (0.5,1),verbose = False):
+def poisson_disc_search_tune(learning_rate_range = (1e-5,1e-1), momentum_range = (0.5,1)\
+,verbose = False, use_logspace = False):
 
-    # Converting to Linear Range.
-    learning_rate_range = ( math.log10(learning_rate_range[1]) , math.log10(learning_rate_range[0]) )
-    hyperparameters,sample_count = poisson_disc_sampler(learning_rate_range,momentum_range, 2)
     accuracy = {}
     time_dict = {}
 
+    # Converting to Linear Range if use_logspace True.
+    if (use_logspace):
+        learning_rate_range = ( math.log10(learning_rate_range[1]) , math.log10(learning_rate_range[0]) )
+
+    hyperparameters,sample_count = poisson_disc_sampler(learning_rate_range,momentum_range, 2)
+
     for hyperparameter in hyperparameters:
         tick = time.time()
-        learning_rate, momentum = 10**hyperparameter[0] ,hyperparameter[1]
+        if (use_logspace):
+            learning_rate, momentum = 10**hyperparameter[0] ,hyperparameter[1]
+        else:
+            learning_rate, momentum = hyperparameter[0] ,hyperparameter[1]
 
         if (verbose):
             print ("learning_rate, momentum: ", learning_rate, momentum)
@@ -105,53 +113,79 @@ def poisson_disc_search_tune(learning_rate_range = (1e-5,1e-1), momentum_range =
 
 """
 Initializing poisson disc search. Performs a sparse followed by a dense search.
-
 """
-def initilize_poisson_disc_search():
+def initilize_poisson_disc_search(plot = False, verbose = False, use_logspace = False):
     # Declaring Parameters for function.
-    learning_rate_range= (1e-4,1e-2)
+    learning_rate_range= (1e-5,1e-2)
     momentum_range = (0.7,1)
-    verbose = True
+
     # Dense Search range offsets. In percent.
-    dense_lr_ofst, dense_mom_ofst = 50, 10
+    dense_lr_ofst, dense_mom_ofst = 20, 10
+
+
+################################################################################
+################################ Sparse Search #################################
+################################################################################
 
     # Tuning Network on the Hyperparameter range. This block Will be treated as
     # a sparse search.
     accuracy, avg_time_taken = poisson_disc_search_tune(learning_rate_range =\
-    learning_rate_range ,momentum_range = momentum_range,verbose = verbose)
+    learning_rate_range ,momentum_range = momentum_range,verbose = verbose, use_logspace = use_logspace)
 
-    #Calculating best Accuracy.
+    # Calculating best Accuracy.
     best_lr, best_mom = max(accuracy, key=accuracy.get)
     best_accuracy = accuracy[(best_lr,best_mom)]
 
-    # best_lr, best_mom = (0.0006694521324073282, 0.7933857494299539)
-    # best_accuracy = 34.5
-    # dense_lr_ofst, dense_mom_ofst = 30, 10
+    # Obtaining keys for plotting.
+    keys = accuracy.keys()
 
     print ("Best Hyperparameter and Accuracy found form Sparse Search:"\
     , best_lr, best_mom, best_accuracy)
+
+    if (plot):
+        plt.plot_heatmap(accuracy= accuracy, file_name= "figures/poisson_heatmap.png")
+
+################################################################################
+################################ Dense Search ##################################
+################################################################################
 
     # Readjusting Hyperparameters for Denser Search.
     learning_rate_range = ( best_lr - (best_lr * dense_lr_ofst / 100 ),\
     best_lr + (best_lr *dense_lr_ofst/ 100) )
     momentum_range = (best_mom - (best_mom * dense_mom_ofst / 100),\
     best_mom + (best_mom * dense_mom_ofst / 100))
-    # print ("learning_rate_range, momentum_range: ",learning_rate_range , momentum_range)
 
     # Tuning Network on the Hyperparameter range. This block Will be treated as
-    # a sparse search.
+    # a dense search.
     accuracy, avg_time_taken = poisson_disc_search_tune(learning_rate_range =\
-    learning_rate_range ,momentum_range = momentum_range,verbose = verbose)
+    learning_rate_range ,momentum_range = momentum_range,verbose = verbose, use_logspace = use_logspace)
 
-    #Calculating best Accuracy.
-    best_lr, best_mom = max(accuracy, key=accuracy.get)
-    best_accuracy = accuracy[(best_lr,best_mom)]
+    # Calculating best Accuracy.
+    best_lr_new, best_mom_new = max(accuracy, key=accuracy.get)
+    best_accuracy_new = accuracy[(best_lr_new,best_mom_new)]
+
+    # Getting keys as it will be used for plotting later.
+    keys += accuracy.keys()
 
     print ("Best Hyperparameter and Accuracy found form Dense Search:"\
-    , best_lr, best_mom, best_accuracy)
+    , best_lr_new, best_mom_new, best_accuracy_new)
 
-    #Appending Output to poisson disc sample file.
-    f = open('outputs/Output_poisson_disc_search.txt','a+')
+    # Selecting the new Hyperparameters if they give better results.
+    if best_accuracy_new > best_accuracy:
+        best_accuracy = best_accuracy_new
+        best_lr = best_lr_new
+        best_mom = best_mom_new
+
+    #Appending Output to poisson disc sample file and plotting the samples.
+    if (use_logspace):
+        f = open('outputs/Output_poisson_disc_search_logspace.txt','a+')
+        if (plot):
+            plt.plot_hyperparameters(keys, "figures/poisson_logspace.png")
+    else :
+        f = open('outputs/Output_poisson_disc_search_regularspace.txt','a+')
+        if (plot):
+            plt.plot_hyperparameters(keys, "figures/poisson_regularspace.png")
+
     f.write('\nbest_lr, best_mom, best_accuracy ' +str(best_lr)+' , '+ \
     str(best_mom) +' , '+ str(best_accuracy) )
     f.close()

@@ -1,6 +1,6 @@
-###############################################################################
+################################################################################
 # This module will scale the Hyperparameter range and sample using Grid Search.
-###############################################################################
+################################################################################
 
 import numpy as np
 import math
@@ -22,8 +22,8 @@ Returns:
 def get_grid_hyperparameters(learning_rate_range,momentum_range, r):
 
     # Initializing length and width. Can Be increased fo changing number of samples.
-    length = 20
-    width = 20
+    length = 28.5
+    width = 28.5
 
     #Seed
     seed = (0,0)
@@ -136,6 +136,12 @@ def initilize_grid_search(plot = False, verbose = False, use_logspace = False):
     if (plot):
         plt.plot_heatmap(accuracy= accuracy, file_name= "figures/grid_heatmap.png")
 
+    f = open('outputs/Output_pure_grid_search.txt','a+')
+    #Writing file in append mode Saving data for calculation.
+    f.write('\nbest_lr, best_mom, best_accuracy ' +str(best_lr)+' , '+ str(best_mom) +' , '+ str(best_accuracy) )
+    f.close()
+
+
 ################################################################################
 ################################ Dense Search ##################################
 ################################################################################
@@ -155,7 +161,7 @@ def initilize_grid_search(plot = False, verbose = False, use_logspace = False):
 
     #Calculating best Accuracy.
     best_lr_new, best_mom_new = max(accuracy, key=accuracy.get)
-    best_accuracy_new = accuracy[(best_lr,best_mom)]
+    best_accuracy_new = accuracy[(best_lr_new,best_mom_new)]
 
     keys += accuracy.keys()
 
